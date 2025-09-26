@@ -90,7 +90,7 @@ with st.form("survey_form"):
         "졸업 후 계획은 무엇인가요?",
         ("취업", "대학원 진학", "창업", "해외 유학", "미정")
     )
-    languages = st.multoselect(
+    languages = st.multiselect(
         "주로 사용하는 프로그래밍 언어는? (다중 선택 가능)",
         ["Python", "JavaScript", "Java", "C/C++", "SQL", "R", "Kotlin/Swift"]
     )
