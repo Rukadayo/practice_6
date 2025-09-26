@@ -73,7 +73,7 @@ with st.form("survey_form"):
         major = st.text_input("학과")
 
     st.header("3. 관심사")
-    hobbies = st.multoselect(
+    hobbies = st.multiselect(
         "취미를 모두 선택해주세요",
         ["운동", "독서", "영화 감상", "음악 감상", "게임", "여행", "코딩"]
     )
