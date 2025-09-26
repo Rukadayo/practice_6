@@ -111,7 +111,7 @@ if submitted:
 with st.sidebar.expander("👨‍💼 관리자 모드", expanded=False):
     password = st.text_input("비밀번호를 입력하세요:", type="password", key="password_input")
 
-    if password == "0501":
+    if password == "0000":
         st.success("인증되었습니다.")
         
         st.header("📊 전체 제출 데이터 관리")
