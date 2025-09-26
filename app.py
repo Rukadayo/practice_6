@@ -23,7 +23,7 @@ with st.form("survey_form"):
         major = st.text_input("학과")
 
     st.header("3. 관심사")
-    hobbies = st.multoselect(
+    hobbies = st.multiselect(
         "취미를 모두 선택해주세요 (여러 개 선택 가능)",
         ["운동", "독서", "영화 감상", "음악 감상", "게임", "여행", "코딩"]
     )
@@ -58,25 +58,26 @@ if password == "0501":
     st.header("📊 전체 제출 데이터 관리")
 
     if st.session_state.all_responses:
-        # 응답 데이터를 하나씩 순회하며 삭제 버튼과 함께 표시
-        # 리스트를 역순으로 순회해야 삭제 시 인덱스 문제가 발생하지 않음
-        for i in reversed(range(len(st.session_state.all_responses))):
-            response = st.session_state.all_responses[i]
-            
-            # 각 응답을 구별하기 쉽게 제목과 구분선 추가
+        # 삭제할 응답의 인덱스를 저장할 리스트
+        indices_to_delete = []
+        
+        # 전체 응답을 순회하며 화면에 표시
+        for i, response in enumerate(st.session_state.all_responses):
             st.subheader(f"응답 {i+1} (제출자: {response['이름']})")
-            
-            # 응답 내용을 표로 표시
             st.table(pd.DataFrame(response.items(), columns=["항목", "응답"]))
             
-            # 각 응답별로 고유한 삭제 버튼 생성
+            # 삭제 버튼을 누르면 해당 인덱스를 리스트에 추가
             if st.button(f"응답 {i+1} 삭제하기", key=f"delete_{i}"):
-                # 해당 인덱스의 응답을 리스트에서 제거
+                indices_to_delete.append(i)
+
+        # 삭제할 인덱스가 있으면, 역순으로 정렬하여 삭제 실행
+        if indices_to_delete:
+            for i in sorted(indices_to_delete, reverse=True):
                 st.session_state.all_responses.pop(i)
-                st.rerun() # 페이지를 새로고침하여 삭제 결과를 즉시 반영
+            st.rerun()
 
         st.write("---")
-        # CSV 다운로드 버튼 (전체 데이터를 기준으로 생성)
+        # CSV 다운로드 버튼 (남아있는 데이터를 기준으로 생성)
         if st.session_state.all_responses:
             all_df = pd.DataFrame(st.session_state.all_responses)
             csv = all_df.to_csv(index=False).encode('utf-8-sig')
