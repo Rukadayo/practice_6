@@ -1,15 +1,19 @@
 import streamlit as st
 import pandas as pd
 import datetime
-import openai # OpenAI 라이브러리 호출
+import openai
+import os
+from dotenv import load_dotenv # .env 파일을 읽어오기 위한 라이브러리
+
+# .env 파일에서 환경 변수를 로드합니다.
+load_dotenv()
+
+# os.getenv()를 사용해 .env 파일에 저장된 API 키를 안전하게 불러옵니다.
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
 # --- AI 요약 함수 (OpenAI 버전) ---
 def get_ai_summary(responses_df):
     """OpenAI API를 호출하여 데이터 요약을 요청하는 함수"""
-    
-    # 중요: 실제 사용 시에는 본인의 OpenAI API 키를 여기에 입력하세요.
-    # https://platform.openai.com/api-keys 에서 발급받을 수 있습니다.
-    OPENAI_API_KEY = "YOUR_OPENAI_API_KEY"
     
     # 데이터프레임을 AI가 이해하기 쉬운 문자열로 변환
     data_string = responses_df.to_string()
@@ -31,7 +35,7 @@ def get_ai_summary(responses_df):
     """
     
     try:
-        # OpenAI 클라이언트 초기화
+        # OpenAI 클라이언트 초기화 (위에서 불러온 OPENAI_API_KEY 변수 사용)
         client = openai.OpenAI(api_key=OPENAI_API_KEY)
         
         # ChatCompletion API 호출
@@ -45,6 +49,8 @@ def get_ai_summary(responses_df):
         summary = response.choices[0].message.content
         return summary
     except Exception as e:
+        if not OPENAI_API_KEY:
+            return "OpenAI API 키가 .env 파일에 설정되지 않았거나 파일을 불러오지 못했습니다. .env 파일을 확인해주세요."
         return f"OpenAI 요약 생성 중 오류가 발생했습니다: {e}\nAPI 키가 올바른지 확인해주세요."
 
 # --- 앱 UI 구성 ---
@@ -111,7 +117,7 @@ if submitted:
 with st.sidebar.expander("👨‍💼 관리자 모드", expanded=False):
     password = st.text_input("비밀번호를 입력하세요:", type="password", key="password_input")
 
-    if password == "0000":
+    if password == "0501":
         st.success("인증되었습니다.")
         
         st.header("📊 전체 제출 데이터 관리")
@@ -141,7 +147,9 @@ with st.sidebar.expander("👨‍💼 관리자 모드", expanded=False):
 
             st.write("---")
             if st.session_state.all_responses:
-                csv = all_df.to_csv(index=False).encode('utf-8-sig')
+                # 삭제가 반영된 후의 데이터를 기준으로 CSV 생성
+                updated_df = pd.DataFrame(st.session_state.all_responses)
+                csv = updated_df.to_csv(index=False).encode('utf-8-sig')
                 st.download_button("남은 데이터 전체 CSV로 다운로드", csv, "survey_responses.csv", "text/csv")
         else:
             st.warning("아직 제출된 데이터가 없습니다.")
