@@ -55,7 +55,7 @@ st.sidebar.title("👨‍💼 관리자 모드")
 password = st.sidebar.text_input("비밀번호를 입력하세요:", type="password")
 
 # 간단한 비밀번호 확인 로직 (실제 사용 시에는 더 안전한 방법 사용 권장)
-if password == "1234":
+if password == "0501":
     st.sidebar.success("인증되었습니다.")
     
     st.write("---")
